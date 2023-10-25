@@ -1,30 +1,29 @@
-from googlesearch import search
+from google import search
 from bs4 import BeautifulSoup
 import requests
+import pandas as pd
+import csv
 
-query='cybersecurity policy/strategy news in singapore'
 
-news_links=[]
-c=0
-for link in search(query, tld="co.in", num=1, stop=40, pause=1):
-    news_links.append(link)
-    c=c+1
-    print(c,end='\r')
+def extract_news(country):
+    query=f"cybersecurity policy/strategy news in \"{country}\""
+    print('>>>',query)
+    news_links=[]
+    c=0
+    for link in search(query, tld="co.in", num=1, stop=10, pause=2,tbs='qdr:w'):
+        news_links.append(link)
+        c=c+1
+        print('Links fetched:',c,end='\r')
 
-for news_link in news_links:
-    print(news_link)
+    return news_links
 
-# url = "https://www.channelnewsasia.com/singapore/singapore-proactive-stance-cyber-threats-updated-national-strategy-2223536"
-url='https://www.kcl.ac.uk/study/postgraduate-taught/courses/cyber-policy-strategy-ma'
-n=0
-response = requests.get(url)
-if response.status_code == 200:
-    soup = BeautifulSoup(response.text, 'html.parser')
-    page_content = soup.prettify()
-    n=n+1
-    # print(page_content)
-else:
-    print("Failed to retrieve the webpage.")
+def log_data(cnt):
+    for country in cnt["Country_Name"]:
+        news_links=extract_news(country)
+        log_data=[country,news_links]
+        with open("news_links.csv", "a",newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(log_data)
 
-print('No of links = ',n)
-print('No of tracable links=',c)
+cnt = pd.read_csv('country.csv')
+log_data(cnt)
