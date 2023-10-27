@@ -1,3 +1,6 @@
+from config import secret_key
+import openai
+
 def link_verification():
     openAI_url="https://api.openai.com/v1/chat/completions"
 
